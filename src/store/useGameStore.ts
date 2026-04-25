@@ -10,6 +10,12 @@ export type Player = {
   name: string;
   position: number;
   color: string;
+  isBot?: boolean;
+};
+
+export type PlayerSetup = {
+  name: string;
+  isBot: boolean;
 };
 
 export type GameState = {
@@ -20,14 +26,18 @@ export type GameState = {
   winner: Player | null;
   config: BoardConfig;
   soundEnabled: boolean;
+  roomId: string | null;
+  localPlayerId: string | null;
   
   // Actions
-  setupGame: (names: string[]) => void;
+  setupGame: (setups: PlayerSetup[]) => void;
   rollDice: () => void;
   moveToken: () => void;
   finishMoving: () => void;
   finishResolving: () => void;
   toggleSound: () => void;
+  setRoomId: (id: string | null) => void;
+  syncState: (newState: Partial<GameState>) => void;
 };
 
 const DEFAULT_COLORS = [
@@ -49,14 +59,30 @@ export const useGameStore = create<GameState>((set, get) => ({
   winner: null,
   config: defaultBoardConfig,
   soundEnabled: true,
+  roomId: null,
+  localPlayerId: typeof window !== 'undefined' ? localStorage.getItem('s&l_player_id') : null,
 
-  setupGame: (names: string[]) => {
-    const players: Player[] = names.map((name, i) => ({
+  setRoomId: (id: string | null) => set({ roomId: id }),
+
+  syncState: (newState: Partial<GameState>) => {
+    set((state) => ({ ...state, ...newState }));
+  },
+
+  setupGame: (setups: PlayerSetup[]) => {
+    const players: Player[] = setups.map((setup, i) => ({
       id: `p${i + 1}`,
-      name: name.trim() || `Player ${i + 1}`,
+      name: setup.name.trim() || (setup.isBot ? `Bot ${i + 1}` : `Player ${i + 1}`),
       position: 1, // Start at cell 1
       color: DEFAULT_COLORS[i % DEFAULT_COLORS.length],
+      isBot: setup.isBot,
     }));
+
+    // Generate a local ID if not exists
+    if (typeof window !== 'undefined' && !localStorage.getItem('s&l_player_id')) {
+      const newId = `p${Math.floor(Math.random() * 1000)}`;
+      localStorage.setItem('s&l_player_id', newId);
+      set({ localPlayerId: newId });
+    }
 
     set({
       players,

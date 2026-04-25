@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useGameStore } from '../store/useGameStore';
-import { Users, Volume2, VolumeX, RotateCcw, Trophy, Plus, X } from 'lucide-react';
+import { Volume2, VolumeX, RotateCcw, Trophy, Plus, X } from 'lucide-react';
 
 export const GameSettings: React.FC = () => {
-  const { setupGame, toggleSound, soundEnabled, winner, players, currentTurnIndex, phase } = useGameStore();
+  const { setupGame, toggleSound, soundEnabled, winner, players, currentTurnIndex } = useGameStore();
   const [playerNames, setPlayerNames] = useState<string[]>(['Player 1', 'Player 2']);
 
   const isGameActive = players.length > 0;

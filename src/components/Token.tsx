@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { getCellPosition } from '../config/boardConfig';
 import { useGameStore } from '../store/useGameStore';
@@ -13,7 +13,6 @@ interface TokenProps {
 export const Token: React.FC<TokenProps> = ({ position, color, index }) => {
   const { x, y } = getCellPosition(position);
   const phase = useGameStore((state) => state.phase);
-  const finishResolving = useGameStore((state) => state.finishResolving);
 
   // Each token is slightly offset based on its index so they don't perfectly overlap
   const offsetX = (index % 2) * 20 - 10;
